@@ -1,8 +1,9 @@
 # Artisans
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/artisans`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Artisans is a gem that helps to compile stylesheets assets in a format of scss.liquid, which might contain settings.
+The main job of this gem is:
+  - To help existing sprocket FileImporter to locate scss files (@import directive), which has scss.liquid extension
+  - To make existing Sass compiler keep inline comments, which include pattern 'settings.xxx'
 
 ## Installation
 
@@ -22,7 +23,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Artisans::Compiler class is responsible for compiling assets. Just invoke:
+
+```ruby
+  Artisans::Compiler.new(my_assets_path, drops_hash).compiled_asset(file_name)  => Sprockets::Asset
+  Artisans::Compiler.new(my_assets_path, drops_hash).compiled_source(file_name) => String
+```
+
+in order to compile a _file_name_ in a folder _my_assets_path_ with liquid variabled from a _drops_hash_.
 
 ## Development
 
