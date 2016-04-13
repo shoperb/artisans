@@ -26,10 +26,10 @@ Or install it yourself as:
 Artisans::Compiler class is responsible for compiling assets. Just invoke:
 
 ```ruby
-  Artisans::Compiler.new(my_assets_path, drops_hash).compiled_asset(file_name)  => Sprockets::Asset
-  Artisans::Compiler.new(my_assets_path, drops_hash).compiled_source(file_name) => String
+  Artisans::Compiler.new(my_asset_sources_path, drops_hash).compiled_asset(file_name)  => Sprockets::Asset
+  Artisans::Compiler.new(my_asset_sources_path, drops_hash).compiled_source(file_name) => String
 
-  Artisans::Compiler.new(theme.asset_path, { settings: SettingDrop.new }).compiled_source(Artisans::Compiler::STYLESHEET_PATH)
+  Artisans::Compiler.new(theme.asset_sources_path, { settings: SettingDrop.new }).compiled_source('application.css')
 ```
 
 in order to compile a _file_name_ in a folder _my_assets_path_ with liquid variabled from a _drops_hash_.
