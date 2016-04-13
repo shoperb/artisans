@@ -34,6 +34,8 @@ Artisans::Compiler class is responsible for compiling assets. Just invoke:
 
 in order to compile a _file_name_ in a folder _my_assets_path_ with liquid variabled from a _drops_hash_.
 
+Important! Asset sources folder should not include compiled assets (otherwise existing compiled assets will be returned by default, without recompilation).
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
