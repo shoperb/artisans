@@ -8,6 +8,8 @@ module Artisans
   module FileImporters
     class SassLiquid < Sass::Importers::Filesystem
 
+      attr_reader :drops
+      
       def initialize(root, drops)
         super(root)
 

@@ -1,4 +1,5 @@
-require 'sass-rails'
+require 'sass'
+require 'sprockets'
 require 'liquid'
 
 require 'artisans/version'

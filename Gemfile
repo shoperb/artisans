@@ -3,5 +3,6 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in artisans.gemspec
 gemspec
 
-gem 'sass-rails', '~> 5.0.0'
+gem 'sass'
+gem 'sprockets', '~> 3.5.2'
 gem 'liquid', git: 'https://github.com/Shopify/liquid.git'
