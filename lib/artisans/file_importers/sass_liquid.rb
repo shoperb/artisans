@@ -9,11 +9,12 @@ module Artisans
     class SassLiquid < Sass::Importers::Filesystem
 
       attr_reader :drops
-      
+
       def initialize(root, drops)
         super(root)
 
-        @drops = drops.stringify_keys
+        @drops = drops
+        @drops.keys.each { |k| @drops[k.to_s] = @drops.delete(k) }
       end
 
       protected
