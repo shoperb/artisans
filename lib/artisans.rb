@@ -6,9 +6,9 @@ require 'zip'
 
 require 'artisans/version'
 require 'artisans/errors'
+require 'artisans/configuration'
 
 require 'artisans/theme_compiler'
-require 'artisans/configuration'
 
 module Artisans
   def self.configure

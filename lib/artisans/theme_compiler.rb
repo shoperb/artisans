@@ -1,3 +1,5 @@
+require 'artisans/environment'
+
 module Artisans
   class ThemeCompiler
 
@@ -38,9 +40,15 @@ module Artisans
 
     def default_compilation_assets
       {
-        javascripts: ['application'],
-        stylesheets: ['application']
+        javascripts: ['application.js'],
+        stylesheets: ['application.css']
       }
+    end
+
+    def compile_without_ext
+      compile.each_with_object({}) do |(type, files), collection|
+        collection[type] = files.map{ |f| File.basename(f, '.*') }
+      end
     end
 
     def process_file(file)
@@ -48,13 +56,13 @@ module Artisans
       source_path = Pathname.new('sources').join(relative_path)
 
       case relative_path.to_s
-        when /\A(assets\/(stylesheets\/((?:#{compile[:stylesheets].join("|")})\.(css(|\.sass|\.scss)|sass|scss)(\.liquid)?)))\z/
+        when /\A(assets\/(stylesheets\/((?:#{compile_without_ext[:stylesheets].join("|")})\.(css(|\.sass|\.scss)|sass|scss)(\.liquid)?)))\z/
           yield source_path, file.read
 
           compiled = compiled_source($~[2])
           filename = "#{$~[1].gsub(".#{$~[4]}", "")}.css"
           yield Pathname.new(filename), compiled
-        when /\A(assets\/(javascripts\/((?:#{compile[:javascripts].join("|")})\.(js|coffee|js\.coffee))))\z/
+        when /\A(assets\/(javascripts\/((?:#{compile_without_ext[:javascripts].join("|")})\.(js|coffee|js\.coffee))))\z/
           yield source_path, file.read
 
           compiled = compiled_source($~[2])
