@@ -1,5 +1,6 @@
 require_relative 'file_importers/sass_liquid'
 require_relative 'processors/scss_processor'
+require_relative 'cached_environment'
 
 module Artisans
   #
@@ -7,11 +8,12 @@ module Artisans
   # and custom SassProcessor
   #
   class Environment < ::Sprockets::Environment
-    attr_reader :sources_path, :drops
+    attr_reader :sources_path, :drops, :assets_url
 
     def initialize **options, &block
       @sources_path = options[:sources_path]
-      @drops = options[:drops]
+      @drops        = options[:drops]
+      @assets_url   = Pathname.new(options[:assets_url])
       super(&block)
 
       assets_path = sources_path.join('assets')
@@ -31,6 +33,10 @@ module Artisans
       self.config = hash_reassoc(config, :paths) { |paths| paths.push(importer) }
 
       register_engine '.scss', Artisans::Processors::ScssProcessor
+    end
+
+    def cached
+      Artisans::CachedEnvironment.new(self)
     end
   end
 end

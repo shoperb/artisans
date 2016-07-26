@@ -23,18 +23,48 @@ Or install it yourself as:
 
 ## Usage
 
-Artisans::Compiler class is responsible for compiling assets. Just invoke:
+The gem can be used for compiling single assets (used directly in shoperb during theme editing) and compiling (and packing to .zip) the whole theme.
+
+Single asset compiling generally looks as following:
 
 ```ruby
-  Artisans::Compiler.new(my_asset_sources_path, drops_hash).compiled_asset(file_name)  => Sprockets::Asset
-  Artisans::Compiler.new(my_asset_sources_path, drops_hash).compiled_source(file_name) => String
+compiler = Artisans::ThemeCompiler.new(theme_sources_path, theme_assets_url, drops: liquid_drops_hash)
 
-  Artisans::Compiler.new(theme.asset_sources_path, { settings: SettingDrop.new }).compiled_source('application.css')
+compiled_output = compiler.compiled_source('source/file/path')
+
+# compiling whole theme. ThemeCompiler#compiled_file_with_derivatives yields every result file one by one
+compiler.compiled_files do |file_path, content, type: :file|
+  # type might be :symlink. type = :file is default
+end
+
+# compilation of only 1 file with its derivatives is also possible:
+# in this case compilation of sources/emails.liquid.haml will result in:
+# - sources/emails/xxx.liquid.haml -> just returns source itself
+# - emails/xxx.liquid -> compiled version
+#
+# Compilation of 'sources/translations/en.json' will result in:
+# - sources/translations/en.json -> the source itself
+# - translations/en.json -> a symlink to the source
+#
+# Compilation of sources/stylesheets/application.sass.liquid will result in:
+# - sources/stylesheets/application.sass.liquid
+# - stylesheets/application.css
+
+compiler.compiled_file_with_derivatives('path/to/source') do |file_path, content, type: :file|
+  # type might be :symlink. type = :file is default
+end
+
 ```
 
-in order to compile a _file_name_ in a folder _my_assets_path_ with liquid variabled from a _drops_hash_.
+Artisans gem have could of configs as well:
 
-Important! Asset sources folder should not include compiled assets (otherwise existing compiled assets will be returned by default, without recompilation).
+```ruby
+Artisans.configure do |c|
+  c.verbose = false # by default
+  c.logger = MyCustomLogger # which should implement #notify method
+end
+```
+
 
 ## Development
 

@@ -3,10 +3,11 @@ require 'artisans/environment'
 module Artisans
   class ThemeCompiler
 
-    attr_reader :sources_path, :compile, :drops
+    attr_reader :sources_path, :assets_url, :compile, :drops
 
-    def initialize(sources_path, drops: {}, compile: nil)
+    def initialize(sources_path, assets_url, drops: {}, compile: nil)
       @sources_path = sources_path.is_a?(String) ? Pathname.new(sources_path) : sources_path
+      @assets_url   = assets_url
       @compile      = compile || default_compilation_assets
       @drops        = drops
 
@@ -101,7 +102,7 @@ module Artisans
     end
 
     def sprockets_env
-      @sprockets_env ||= Artisans::Environment.new(sources_path: sources_path, drops: drops)
+      @sprockets_env ||= Artisans::Environment.new(sources_path: sources_path, assets_url: assets_url, drops: drops)
     end
   end
 end
