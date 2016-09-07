@@ -33,7 +33,8 @@ module Artisans
     end
 
     def compiled_source(asset_path)
-      compiled_asset(asset_path).source
+      asset = compiled_asset(asset_path)
+      asset ? asset.source : (raise "Asset not found: #{asset_path}")
     end
 
     private

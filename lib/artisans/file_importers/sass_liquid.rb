@@ -17,6 +17,7 @@ module Artisans
         @drops.keys.each { |k| @drops[k.to_s] = @drops.delete(k) }
       end
 
+      alias_method :to_str, :to_s
       protected
 
       def extensions
