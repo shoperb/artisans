@@ -21,6 +21,7 @@ module Artisans
       def call(input)
         super.tap do |hash|
           hash[:data] = hash[:data].gsub(/"(\/\*settings\..+\[.+\]\*\/)"/, '\1')
+          hash[:data] = hash[:data].gsub(/(" (.*?) ")/, '"\2"') # if value has quotes, then some redundant spaces are added. we remove them here
         end
       end
 
