@@ -10,11 +10,12 @@ module Artisans
 
       attr_reader :drops
 
-      def initialize(root, drops)
+      def initialize(root, drops, file_reader)
         super(root)
 
         @drops = drops
         @drops.keys.each { |k| @drops[k.to_s] = @drops.delete(k) }
+        @file_reader = file_reader
       end
 
       alias_method :to_str, :to_s
@@ -26,8 +27,6 @@ module Artisans
           'scss.liquid' => :scss
         }
       end
-
-      private
 
       def _find(dir, name, options)
         #
@@ -45,7 +44,8 @@ module Artisans
         #
         # below goes the modification of original function
         #
-        file_content    = File.read(full_filename)
+        binding.pry
+        file_content    = @file_reader.read(full_filename)
         liquid_compiled = Liquid::Template.parse(file_content).render(drops)
 
         Sass::Engine.new(liquid_compiled, options)

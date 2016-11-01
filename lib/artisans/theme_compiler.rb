@@ -3,13 +3,22 @@ require 'artisans/environment'
 module Artisans
   class ThemeCompiler
 
+    module DefaultFileReader
+      extend self
+
+      def read(file)
+        File.read(file)
+      end
+    end
+
     attr_reader :sources_path, :assets_url, :compile, :drops
 
-    def initialize(sources_path, assets_url, drops: {}, compile: nil)
+    def initialize(sources_path, assets_url, **options)
       @sources_path = sources_path.is_a?(String) ? Pathname.new(sources_path) : sources_path
       @assets_url   = assets_url
-      @compile      = compile || default_compilation_assets
-      @drops        = drops
+      @compile      = options[:compile] || default_compilation_assets
+      @drops        = options[:drops] || {}
+      @file_reader  = options[:file_reader] || Artisans::ThemeCompiler::DefaultFileReader
 
       @compile.keys.each { |k| @compile[k.to_sym] = @compile.delete(k) }
 
@@ -34,10 +43,10 @@ module Artisans
 
     def compiled_source(asset_path)
       asset = compiled_asset(asset_path)
-      asset ? asset.source : (raise "Asset not found: #{asset_path}")
+      asset ? asset.source : (raise "Asset not found: #{asset_path} in #{sources_path.join('assets')}")
     end
 
-    private
+    protected
     attr_accessor :compiled_assets
 
     def default_compilation_assets
@@ -57,15 +66,17 @@ module Artisans
       relative_path = file.relative_path_from(sources_path)
       source_path = Pathname.new('sources').join(relative_path)
 
+      file_content = @file_reader.read(file)
+
       case relative_path.to_s
         when /\A(assets\/(stylesheets\/((?:#{compile_without_ext[:stylesheets].join("|")})\.(css(|\.sass|\.scss)|sass|scss)(\.liquid)?)))\z/
-          yield source_path, file.read
+          yield source_path, file_content
 
           compiled = compiled_source($~[2])
           filename = "#{$~[1].gsub(".#{$~[4]}", "")}.css"
           yield Pathname.new(filename), compiled
         when /\A(assets\/(javascripts\/((?:#{compile_without_ext[:javascripts].join("|")})\.(js|coffee|js\.coffee))))\z/
-          yield source_path, file.read
+          yield source_path, file_content
 
           compiled = compiled_source($~[2])
           filename = "#{$~[1].gsub(".#{$~[4]}", "")}.js"
@@ -73,16 +84,22 @@ module Artisans
         when /\A((layouts|templates|emails)\/(.*\.liquid))\z/,
              /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf))))\z/,
              /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2))))\z/
-          yield source_path, file.read
-          yield relative_path, source_path, type: :symlink
+          yield relative_path, file_content
+          yield source_path, relative_path, type: :symlink
         when /\A((layouts|templates|emails)\/(.*\.liquid))\.haml\z/
-          yield source_path, file.read
-          yield Pathname.new($1.dup), Haml::Engine.new(file.read).render
+          content_compiled = Haml::Engine.new(file_content).render
+          yield Pathname.new($1.dup), content_compiled
+
+          if file_content == content_compiled
+            yield source_path, Pathname.new($1.dup), type: :symlink
+          else
+            yield source_path, file_content
+          end
         when /\A((presets|config|translations)\/(.*\.json))\z/
-          yield source_path, file.read
-          yield relative_path, source_path, type: :symlink
+          yield relative_path, file_content
+          yield source_path, relative_path, type: :symlink
         when /\A(assets\/(javascripts\/(.*\.(js|coffee|js\.coffee))))\z/, /\A(assets\/(stylesheets\/(.*\.(css(|\.sass|\.scss)|sass|scss)(\.liquid)?)))\z/
-          yield source_path, file.read
+          yield source_path, file_content
       end
     end
 
@@ -90,6 +107,7 @@ module Artisans
       compiled_assets[asset_path] ||= begin
         sprockets_env[asset_path]
       rescue StandardError => e
+        binding.pry
         raise Artisans::CompilationError.new(e)
       end
     end
@@ -103,7 +121,12 @@ module Artisans
     end
 
     def sprockets_env
-      @sprockets_env ||= Artisans::Environment.new(sources_path: sources_path, assets_url: assets_url, drops: drops)
+      @sprockets_env ||= Artisans::Environment.new(
+        sources_path: sources_path,
+        assets_url: assets_url,
+        drops: drops,
+        file_reader: @file_reader
+      )
     end
   end
 end

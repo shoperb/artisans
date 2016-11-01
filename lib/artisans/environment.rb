@@ -1,4 +1,6 @@
 require_relative 'file_importers/sass_liquid'
+require_relative 'file_importers/custom'
+
 require_relative 'processors/scss_processor'
 require_relative 'cached_environment'
 
@@ -14,13 +16,15 @@ module Artisans
       @sources_path = options[:sources_path]
       @drops        = options[:drops]
       @assets_url   = Pathname.new(options[:assets_url])
-      super(&block)
+      @file_reader  = options[:file_reader]
 
-      assets_path = sources_path.join('assets')
+      assets_path   = sources_path.join('assets')
+
+      super(&block)
 
       context_class.class_eval %Q{
         def asset_path(path, options = {})
-          File.join("#{assets_path}",path)
+          File.join(assets_path.to_s,path)
         end
       }
 
@@ -28,9 +32,13 @@ module Artisans
       #append_path(assets_path.join('stylesheets'))
       #append_path(assets_path.join('javascripts'))
 
-      importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets'), drops)
+      custom_importer = Artisans::FileImporters::Custom.new(assets_path.join('stylesheets'), @file_reader)
+      liquid_importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets'), drops, @file_reader)
 
-      self.config = hash_reassoc(config, :paths) { |paths| paths.push(importer) }
+      self.config = hash_reassoc(config, :paths) do |paths|
+        paths.push(custom_importer)
+        paths.push(liquid_importer)
+      end
 
       register_engine '.scss', Artisans::Processors::ScssProcessor
     end
@@ -40,3 +48,4 @@ module Artisans
     end
   end
 end
+
