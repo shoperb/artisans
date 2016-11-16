@@ -7,7 +7,7 @@ module Artisans
       extend self
 
       def read(file)
-        File.read(file)
+        File.read(file) if File.file?(file)
       end
     end
 
@@ -107,7 +107,9 @@ module Artisans
       compiled_assets[asset_path] ||= begin
         sprockets_env[asset_path]
       rescue StandardError => e
-        binding.pry
+        puts e.message
+        puts e.backtrace
+
         raise Artisans::CompilationError.new(e)
       end
     end

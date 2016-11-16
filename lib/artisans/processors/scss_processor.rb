@@ -10,7 +10,6 @@ module Artisans
     class ScssProcessor < Sprockets::ScssProcessor
 
       def initialize(options={}, &block)
-        options[:functions] = self.class::Functions
         super(options, &block)
       end
       #
@@ -22,12 +21,6 @@ module Artisans
         super.tap do |hash|
           hash[:data] = hash[:data].gsub(/"(\/\*settings\..+\[.+\]\*\/)"/, '\1')
           hash[:data] = hash[:data].gsub(/(" (.*?) ")/, '"\2"') # if value has quotes, then some redundant spaces are added. we remove them here
-        end
-      end
-
-      module Functions
-        def asset_url(path, options = {})
-          Sass::Script::String.new("url(#{sprockets_environment.assets_url.join(path.value)})")
         end
       end
     end
