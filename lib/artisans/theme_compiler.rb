@@ -46,6 +46,10 @@ module Artisans
       asset ? asset.source : (raise "Asset not found: #{asset_path} in #{sources_path.join('assets')}")
     end
 
+    def rack_response env
+      sprockets_env.call(env)
+    end
+
     protected
     attr_accessor :compiled_assets
 

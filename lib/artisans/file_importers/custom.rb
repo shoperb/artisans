@@ -15,8 +15,6 @@ module Artisans
 
       alias_method :to_str, :to_s
 
-      delegate :path_matches, to: :file_reader
-
       protected
 
       def _find(dir, name, options)
