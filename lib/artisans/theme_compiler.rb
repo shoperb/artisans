@@ -86,8 +86,8 @@ module Artisans
           filename = "#{$~[1].gsub(".#{$~[4]}", "")}.js"
           yield Pathname.new(filename), compiled
         when /\A((layouts|templates|emails)\/(.*\.liquid))\z/,
-             /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf))))\z/,
-             /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2))))\z/
+             /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf|json))))\z/,
+             /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2|svg))))\z/
           yield relative_path, file_content
           yield source_path, relative_path, type: :symlink
         when /\A((layouts|templates|emails)\/(.*\.liquid))\.haml\z/
