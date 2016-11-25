@@ -30,7 +30,7 @@ module Artisans
           if environment.file_reader.respond_to?(:find_digest)
             digest = environment.file_reader.find_digest(full_path)
           else
-            digest = Digest::MD5.hexdigest(File.read(full_path))
+            digest = Digest::MD5.hexdigest(File.read(full_path)) if File.exists?(full_path)
           end
           ext = File.extname(path)
           File.join('#{assets_url}', "\#{path.gsub(/\#{Regexp.quote(ext)}\\z/, '')}\#{digest}\#{ext}")
