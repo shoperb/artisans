@@ -10,11 +10,15 @@ module Artisans
 
       attr_reader :drops
 
-      def initialize(root, drops)
+      def initialize(root, drops, file_reader)
         super(root)
+
+        @root = root.to_s
+        @real_root = Sass::Util.realpath(@root).to_s
 
         @drops = drops
         @drops.keys.each { |k| @drops[k.to_s] = @drops.delete(k) }
+        @file_reader = file_reader
       end
 
       alias_method :to_str, :to_s
@@ -27,14 +31,13 @@ module Artisans
         }
       end
 
-      private
-
       def _find(dir, name, options)
-        #
-        # starts as the original function
-        #
-        full_filename, syntax = ::Sass::Util.destructure(find_real_file(dir, name, options))
-        return unless full_filename && File.readable?(full_filename)
+        if @file_reader.respond_to?(:find_real_file)
+          full_filename, syntax = @file_reader.find_real_file(dir, name, options, extensions)
+        else
+          full_filename, syntax = Sass::Util.destructure(find_real_file(dir, name, options))
+        end
+        return unless full_filename
 
         full_filename = full_filename.tr("\\", "/") if Sass::Util.windows?
 
@@ -45,7 +48,7 @@ module Artisans
         #
         # below goes the modification of original function
         #
-        file_content    = File.read(full_filename)
+        file_content    = @file_reader.read(full_filename)
         liquid_compiled = Liquid::Template.parse(file_content).render(drops)
 
         Sass::Engine.new(liquid_compiled, options)
