@@ -40,7 +40,7 @@ module Artisans
       #append_path(assets_path.join('stylesheets'))
       #append_path(assets_path.join('javascripts'))
 
-      custom_importer = Artisans::FileImporters::Custom.new(assets_path.join('stylesheets').to_s, @file_reader)
+      custom_importer = Artisans::FileImporters::Custom.new(assets_path.to_s, @file_reader)  if @file_reader
       liquid_importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets').to_s, drops, @file_reader)
 
       self.config = hash_reassoc(config, :paths) do |paths|
@@ -48,6 +48,10 @@ module Artisans
         paths.push(custom_importer)
         paths.push(liquid_importer)
       end
+
+      register_mime_type 'application/font-woff', extensions: ['.woff2']  # not registered by default
+      register_mime_type 'application/pdf',       extensions: ['.pdf']    # not registered by default
+      register_mime_type 'application/liquid',    extensions: ['.liquid'] # not registered by default
 
       register_engine '.scss', Artisans::Processors::ScssProcessor
     end
