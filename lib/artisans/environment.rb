@@ -27,13 +27,17 @@ module Artisans
       context_class.class_eval %Q{
         def asset_path(path, options = {})
           full_path = File.join('#{assets_path}', path)
-          if environment.file_reader.respond_to?(:find_digest)
-            digest = environment.file_reader.find_digest(full_path)
-          else
-            digest = Digest::MD5.hexdigest(File.read(full_path)) if File.exists?(full_path)
-          end
+          reader = environment.file_reader
+
+          digest = reader.try(:find_digest, full_path)
+          digest ||= Digest::MD5.hexdigest(File.read(full_path)) if File.exists?(full_path)
+
+          separator = reader.try(:find_separator, full_path)
+          separator ||= ''
+
           ext = File.extname(path)
-          File.join('#{assets_url}', "\#{path.gsub(/\#{Regexp.quote(ext)}\\z/, '')}\#{digest}\#{ext}")
+          filename = [path.gsub(/\#{Regexp.quote(ext)}\\z/, ''), separator, digest, ext].map(&:presence).compact.join
+          File.join('#{assets_url}', filename)
         end
       }
 
