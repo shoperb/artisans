@@ -41,8 +41,8 @@ module Artisans
         end
       }
 
-      #append_path(assets_path.join('stylesheets'))
-      #append_path(assets_path.join('javascripts'))
+      append_path(assets_path.join('stylesheets'))
+      append_path(assets_path.join('javascripts'))
 
       custom_importer = Artisans::FileImporters::Custom.new(assets_path.to_s, @file_reader)  if @file_reader
       liquid_importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets').to_s, drops, @file_reader)
