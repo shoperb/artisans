@@ -29,13 +29,13 @@ module Artisans
       end
     end
 
-    def resolve_absolute_path(paths, filename, accept)
-      if file_reader.respond_to?(:resolve_absolute_path)
-        file_reader.resolve_absolute_path(paths, filename, accept, self)
-      else
-        super(paths, filename, accept)
-      end
-    end
+    # def resolve_absolute_path(paths, filename, accept)
+    #   if file_reader.respond_to?(:resolve_absolute_path)
+    #     file_reader.resolve_absolute_path(paths, filename, accept, self)
+    #   else
+    #     super(paths, filename, accept)
+    #   end
+    # end
 
     def load(uri, force_native = false)
       if file_reader.respond_to?(:load) && !force_native

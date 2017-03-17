@@ -41,15 +41,32 @@ module Artisans
         end
       }
 
-      append_path(assets_path.join('stylesheets'))
-      append_path(assets_path.join('javascripts'))
+      # regular paths, used for RTE, for file-system compilation
+      env_paths = [
+        assets_path,
+        assets_path.join('stylesheets'),
+        assets_path.join('javascripts')
+      ]
 
-      custom_importer = Artisans::FileImporters::Custom.new(assets_path.to_s, @file_reader)  if @file_reader
+      env_paths.each do |p|
+        append_path p
+      end
+
+      # extended path, which can delegate to database file reader
+      customer_importers = []
+
+      if @file_reader
+        env_paths.each do |p|
+          customer_importers << Artisans::FileImporters::Custom.new(p.to_s, @file_reader)
+        end
+      end
+
+      # custom importer for both cases
       liquid_importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets').to_s, drops, @file_reader)
 
       self.config = hash_reassoc(config, :paths) do |paths|
         paths.push(assets_path.to_s)
-        paths.push(custom_importer)
+        customer_importers.each { |i| paths.push(i) }
         paths.push(liquid_importer)
       end
 
