@@ -85,12 +85,12 @@ module Artisans
           compiled = compiled_source($~[2])
           filename = "#{$~[1].gsub(".#{$~[4]}", "")}.js"
           yield Pathname.new(filename), compiled
-        when /\A((layouts|templates|emails)\/(.*\.liquid))\z/,
+        when /\A((layouts|templates|emails|sections)\/(.*\.liquid))\z/,
              /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf|json))))\z/,
              /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2|svg))))\z/
           yield relative_path, file_content
           yield source_path, relative_path, type: :symlink
-        when /\A((layouts|templates|emails)\/(.*\.liquid))\.haml\z/
+        when /\A((layouts|templates|emails|sections)\/(.*\.liquid))\.haml\z/
           content_compiled = Haml::Engine.new(file_content).render
           yield Pathname.new($1.dup), content_compiled
 
