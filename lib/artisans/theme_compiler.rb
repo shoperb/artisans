@@ -11,20 +11,16 @@ module Artisans
       end
     end
 
-    attr_reader :sources_path, :assets_url, :compile, :drops
+    attr_reader :sources_path, :assets_url, :compile, :settings
 
     def initialize(sources_path, assets_url, **options)
       @sources_path = sources_path.is_a?(String) ? Pathname.new(sources_path) : sources_path
       @assets_url   = assets_url
       @compile      = options[:compile] || default_compilation_assets
-      @drops        = options[:drops] || {}
+      @settings     = options[:settings] || {}
       @file_reader  = options[:file_reader] || Artisans::ThemeCompiler::DefaultFileReader
 
       @compile.keys.each { |k| @compile[k.to_sym] = @compile.delete(k) }
-
-      unless drops_valid?(drops)
-        raise Artisans::ArgumentsError.new('Drops should be a hash with Liquid::Drop values')
-      end
 
       @compiled_assets = {}
     end
@@ -122,15 +118,11 @@ module Artisans
       Artisans.configuration.logger
     end
 
-    def drops_valid?(drops)
-      drops.is_a?(Hash) && drops.values.all?{ |d| d.is_a?(Liquid::Drop) }
-    end
-
     def sprockets_env
       @sprockets_env ||= Artisans::Environment.new(
         sources_path: sources_path,
         assets_url: assets_url,
-        drops: drops,
+        settings: settings,
         file_reader: @file_reader
       )
     end

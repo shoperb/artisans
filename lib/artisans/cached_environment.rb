@@ -1,11 +1,12 @@
 module Artisans
   class CachedEnvironment < ::Sprockets::CachedEnvironment
-    attr_accessor :assets_url, :environment, :file_reader
+    attr_accessor :assets_url, :environment, :file_reader, :drops
 
     def initialize(environment, options={})
       @assets_url  = environment.assets_url
       @environment = environment
       @file_reader = environment.file_reader
+      @drops       = environment.drops
       super(environment)
     end
 

@@ -1,8 +1,10 @@
-require_relative 'file_importers/sass_liquid'
-require_relative 'file_importers/custom'
-
-require_relative 'processors/scss_processor'
 require_relative 'cached_environment'
+require_relative 'file_importer'
+require_relative 'liquid/drops/settings_drop'
+
+require_relative 'sass/sass_liquid_importer'
+require_relative 'sass/settings_processor'
+require_relative 'sass/script/lexer'
 
 module Artisans
   #
@@ -10,15 +12,14 @@ module Artisans
   # and custom SassProcessor
   #
   class Environment < ::Sprockets::Environment
-    attr_reader :sources_path, :drops, :assets_url, :file_reader
+    attr_reader :sources_path, :settings, :assets_url, :file_reader
 
     def initialize **options, &block
       @sources_path = options[:sources_path]
-      @drops        = options[:drops]
+      @settings     = options[:settings]
+
       @assets_url   = Pathname.new(options[:assets_url])
       @file_reader  = options[:file_reader]
-
-      assets_path   = sources_path.join('assets')
 
       super(&block)
 
@@ -41,40 +42,51 @@ module Artisans
         end
       }
 
-      # regular paths, used for RTE, for file-system compilation
-      env_paths = [
-        assets_path,
-        assets_path.join('stylesheets'),
-        assets_path.join('javascripts')
-      ]
+      append_path assets_path
+      append_path stylesheets_path
+      append_path javascripts_path
 
-      env_paths.each do |p|
-        append_path p
-      end
-
-      # extended path, which can delegate to database file reader
-      customer_importers = []
-
-      if @file_reader
-        env_paths.each do |p|
-          customer_importers << Artisans::FileImporters::Custom.new(p.to_s, @file_reader)
-        end
-      end
-
-      # custom importer for both cases
-      liquid_importer = Artisans::FileImporters::SassLiquid.new(assets_path.join('stylesheets').to_s, drops, @file_reader)
-
+      # cant use 'append_path' with objects importers, so:
       self.config = hash_reassoc(config, :paths) do |paths|
-        paths.push(assets_path.to_s)
-        customer_importers.each { |i| paths.push(i) }
-        paths.push(liquid_importer)
+        paths.push(sass_liquid_importer)
+        paths.push(custom_file_importer(assets_path))
+        paths.push(custom_file_importer(stylesheets_path))
+        paths.push(custom_file_importer(javascripts_path))
       end
 
       register_mime_type 'application/font-woff', extensions: ['.woff2']  # not registered by default
       register_mime_type 'application/pdf',       extensions: ['.pdf']    # not registered by default
       register_mime_type 'application/liquid',    extensions: ['.liquid'] # not registered by default
 
-      register_engine '.scss', Artisans::Processors::ScssProcessor
+      register_engine '.scss', Artisans::Sass::SettingsProcessor
+    end
+
+    def drops
+      @drops ||= {
+        settings: settings
+      }.stringify_keys
+    end
+
+    private
+
+    def sass_liquid_importer
+      Artisans::Sass::SassLiquidImporter.new(stylesheets_path, self)
+    end
+
+    def custom_file_importer(path)
+      Artisans::FileImporter.new(path, self)
+    end
+
+    def assets_path
+      @assets_path ||= sources_path.join('assets')
+    end
+
+    def stylesheets_path
+      @stylesheets_path ||= assets_path.join('stylesheets').to_s
+    end
+
+    def javascripts_path
+      @javascripts_path ||= assets_path.join('javascripts').to_s
     end
 
     def cached
@@ -82,4 +94,3 @@ module Artisans
     end
   end
 end
-

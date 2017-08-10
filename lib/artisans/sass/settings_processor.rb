@@ -1,13 +1,14 @@
 #
-# Artisans::Processors::ScssProcessor inherits all functionality of built-it
+# Artisans::Sass::SettingsProcessor inherits all functionality of built-it
 # sprockets scss processors class.
-# Artisans::Processors::ScssProcessor is intended to integerate custom file importer (FileIMporters::SassLiquid),
+#
+# Artisans::Sass::SettingsProcessor is intended to integerate custom file importer (Artisans::Sass::FileImporter),
 # which is able to @import liquid files. In addition, ScssProcessor processed correctly
 # inline comments in scss file.
 #
 module Artisans
-  module Processors
-    class ScssProcessor < Sprockets::ScssProcessor
+  module Sass
+    class SettingsProcessor < Sprockets::ScssProcessor
 
       def initialize(options={}, &block)
         super(options, &block)
@@ -19,7 +20,7 @@ module Artisans
       #
       def call(input)
         super.tap do |hash|
-          hash[:data] = hash[:data].gsub(/"(\/\*settings\..+\[.+\]\*\/)"/, '\1')
+          hash[:data] = hash[:data].gsub(/["'](\/\*settings\..+\[.+\]\*\/)["']/, '\1')
           hash[:data] = hash[:data].gsub(/(" (.*?) ")/, '"\2"') # if value has quotes, then some redundant spaces are added. we remove them here
         end
       end
