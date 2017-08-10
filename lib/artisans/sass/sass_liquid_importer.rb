@@ -8,6 +8,10 @@ module Artisans
 
       def initialize(root, environment = nil)
         super(root)
+
+        @root = root.to_s
+        @real_root = ::Sass::Util.realpath(@root).to_s
+
         @environment = environment
       end
 

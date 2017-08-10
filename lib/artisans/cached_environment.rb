@@ -18,7 +18,7 @@ module Artisans
       end
     end
 
-    def read_file(filename, content_type)
+    def read_file(filename, content_type = nil)
       @file_reader.read(filename)
     end
 
@@ -55,8 +55,8 @@ module Artisans
     end
 
     def path_matches(load_path, logical_name, logical_basename)
-      if load_path.respond_to?(:file_reader) && load_path.file_reader.respond_to?(:path_matches)
-        load_path.file_reader.path_matches(load_path, logical_name, logical_basename)
+      if file_reader && file_reader.respond_to?(:path_matches)
+        file_reader.path_matches(load_path, logical_name, logical_basename)
       else
         super(load_path, logical_name, logical_basename)
       end

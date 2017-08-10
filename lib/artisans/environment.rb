@@ -1,5 +1,4 @@
 require_relative 'cached_environment'
-require_relative 'file_importer'
 require_relative 'liquid/drops/settings_drop'
 
 require_relative 'sass/sass_liquid_importer'
@@ -42,16 +41,13 @@ module Artisans
         end
       }
 
-      append_path assets_path
-      append_path stylesheets_path
-      append_path javascripts_path
-
       # cant use 'append_path' with objects importers, so:
       self.config = hash_reassoc(config, :paths) do |paths|
+        paths.push(assets_path.to_s)
+        paths.push(stylesheets_path)
+        paths.push(javascripts_path)
+
         paths.push(sass_liquid_importer)
-        paths.push(custom_file_importer(assets_path))
-        paths.push(custom_file_importer(stylesheets_path))
-        paths.push(custom_file_importer(javascripts_path))
       end
 
       register_mime_type 'application/font-woff', extensions: ['.woff2']  # not registered by default
@@ -63,18 +59,18 @@ module Artisans
 
     def drops
       @drops ||= {
-        settings: settings
+        settings: SettingsDrop.new(settings)
       }.stringify_keys
+    end
+
+    def read_file(filename)
+      cached.read_file(filename)
     end
 
     private
 
     def sass_liquid_importer
       Artisans::Sass::SassLiquidImporter.new(stylesheets_path, self)
-    end
-
-    def custom_file_importer(path)
-      Artisans::FileImporter.new(path, self)
     end
 
     def assets_path
@@ -90,7 +86,7 @@ module Artisans
     end
 
     def cached
-      Artisans::CachedEnvironment.new(self)
+      @cached ||= Artisans::CachedEnvironment.new(self)
     end
   end
 end
