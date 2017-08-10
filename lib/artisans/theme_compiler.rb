@@ -20,8 +20,7 @@ module Artisans
       @settings     = options[:settings] || {}
       @file_reader  = options[:file_reader] || Artisans::ThemeCompiler::DefaultFileReader
 
-      @compile.keys.each { |k| @compile[k.to_sym] = @compile.delete(k) }
-
+      @compile.symbolize_keys!
       @compiled_assets = {}
     end
 
