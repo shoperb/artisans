@@ -86,7 +86,7 @@ module Artisans
     end
 
     def cached
-      @cached ||= Artisans::CachedEnvironment.new(self)
+      Artisans::CachedEnvironment.new(self)
     end
   end
 end
