@@ -14,7 +14,7 @@ module Artisans
         end
 
         self::REGULAR_EXPRESSIONS[:settings_color] = settings_re(self::REGULAR_EXPRESSIONS[:color])
-        self::REGULAR_EXPRESSIONS[:settings_rgb_color] = settings_re(/rgba?\((\d+)\s*,(\d+)\s*,(\d+)\s*,(\d+)?\s*\)/)
+        self::REGULAR_EXPRESSIONS[:settings_rgb_color] = settings_re(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*(\d+))?\s*\)/)
 
         private
 
@@ -57,7 +57,7 @@ module Artisans
         def settings_rgb_color
           return unless @scanner.match?(self.class::REGULAR_EXPRESSIONS[:settings_rgb_color])
           scanned_color = scan(self.class::REGULAR_EXPRESSIONS[:settings_rgb_color])
-          script_color = ::Sass::Script::Value::Color.new([@scanner[3].to_f, @scanner[4].to_f, @scanner[5].to_f, @scanner[6].to_f || 1])
+          script_color = ::Sass::Script::Value::Color.new([@scanner[3].to_f, @scanner[4].to_f, @scanner[5].to_f, @scanner[7].to_f || 1])
           script_color.instance_variable_set("@representation", @scanner[0].gsub(/^'/, '').gsub(/'$/, ''))
           [:color, script_color]
         end
