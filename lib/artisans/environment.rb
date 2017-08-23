@@ -59,7 +59,7 @@ module Artisans
 
     def drops
       @drops ||= {
-        settings: SettingsDrop.new(settings)
+        settings: Artisans::SettingsDrop.new(settings)
       }.stringify_keys
     end
 
