@@ -37,7 +37,7 @@ module Artisans
           # Injecting 'settings_color'
           # lexer check in here
           #
-          variable || settings_color || settings_rgb_color || settings_number || string(:double, false) || string(:single, false) || color || number || id ||
+          variable || settings_color || settings_rgb_color || string(:double, false) || string(:single, false) || color || number || id ||
             selector || string(:uri, false) || raw(self.class::UNICODERANGE) || special_fun || special_val ||
             ident_op || ident || op
         end
@@ -63,16 +63,16 @@ module Artisans
           [:color, script_color]
         end
 
-        def settings_number
-          return unless scan(self.class::REGULAR_EXPRESSIONS[:settings_number])
+        # def settings_number
+        #   return unless scan(self.class::REGULAR_EXPRESSIONS[:settings_number])
 
-          value = (@scanner[2] ? @scanner[2].to_f : @scanner[3].to_i)
-          value *= 10**@scanner[4].to_i if @scanner[4]
-          script_number = ::Sass::Script::Value::Number.new(value, Array(@scanner[4]))
-          script_number.original = @scanner[1]
+        #   value = (@scanner[2] ? @scanner[2].to_f : @scanner[3].to_i)
+        #   value *= 10**@scanner[4].to_i if @scanner[4]
+        #   script_number = ::Sass::Script::Value::Number.new(value, Array(@scanner[4]))
+        #   script_number.original = @scanner[1]
 
-          [:number, script_number]
-        end
+        #   [:number, script_number]
+        # end
       end
     end
   end
