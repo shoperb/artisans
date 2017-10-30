@@ -14,7 +14,7 @@ module Artisans
         end
 
         self::REGULAR_EXPRESSIONS[:settings_color] = settings_re(self::REGULAR_EXPRESSIONS[:color])
-        self::REGULAR_EXPRESSIONS[:settings_rgb_color] = settings_re(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*(\d+))?\s*\)/)
+        self::REGULAR_EXPRESSIONS[:settings_rgb_color] = settings_re(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*(\d+.?\d*))?\s*\)/)
         self::REGULAR_EXPRESSIONS[:settings_number] = settings_re(self::REGULAR_EXPRESSIONS[:number])
 
         private
