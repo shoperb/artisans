@@ -53,8 +53,8 @@ module Artisans
       register_mime_type 'application/font-woff', extensions: ['.woff2']  # not registered by default
       register_mime_type 'application/pdf',       extensions: ['.pdf']    # not registered by default
       register_mime_type 'application/liquid',    extensions: ['.liquid'] # not registered by default
-
-      register_engine '.scss', Artisans::Sass::SettingsProcessor
+      register_mime_type 'text/scss',             extensions: ['.scss'], charset: :unicode
+      register_transformer 'text/scss', 'text/css', Artisans::Sass::SettingsProcessor
     end
 
     def drops
