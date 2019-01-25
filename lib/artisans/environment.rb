@@ -55,6 +55,12 @@ module Artisans
       register_mime_type 'application/liquid',    extensions: ['.liquid'] # not registered by default
       register_mime_type 'text/scss',             extensions: ['.scss'], charset: :unicode
       register_transformer 'text/scss', 'text/css', Artisans::Sass::SettingsProcessor
+
+      # register_transformer is not working on current rails if engine is set, 
+      # so add manually to engine to rewrite Sprockets::ScssProcessor transformer
+      self.config = hash_reassoc(config, :engines) do |engines|
+        engines.merge(".scss" => Artisans::Sass::SettingsProcessor)
+      end
     end
 
     def drops
