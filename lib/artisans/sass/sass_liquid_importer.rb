@@ -5,14 +5,23 @@
 module Artisans
   module Sass
     class SassLiquidImporter < ::Sass::Importers::Filesystem
+      def self.environment= env
+        @environment = env
+      end
+
+      def self.environment
+        @environment
+      end
+
 
       def initialize(root, environment = nil)
+        @environment = environment||self.class.environment
+        root = @environment.send(:stylesheets_path)
+
         super(root)
 
         @root = root.to_s
         @real_root = ::Sass::Util.realpath(@root).to_s
-
-        @environment = environment
       end
 
       alias_method :to_str, :to_s

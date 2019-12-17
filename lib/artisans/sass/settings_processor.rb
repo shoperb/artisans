@@ -6,11 +6,13 @@
 # which is able to @import liquid files. In addition, ScssProcessor processed correctly
 # inline comments in scss file.
 #
+require "sprockets/sass_processor.rb"
 module Artisans
   module Sass
     class SettingsProcessor < Sprockets::ScssProcessor
 
       def initialize(options={}, &block)
+        options[:importer] ||= Artisans::Sass::SassLiquidImporter
         super(options, &block)
       end
       #
