@@ -54,12 +54,26 @@ module Artisans
       end
     end
 
+    # Overrides resolver path_matches in sprockets 3.5
     def path_matches(load_path, logical_name, logical_basename)
       if file_reader && file_reader.respond_to?(:path_matches)
         file_reader.path_matches(load_path, logical_name, logical_basename)
       else
         super(load_path, logical_name, logical_basename)
       end
+    end
+
+    # Overrides resolver for sprockets 4.0 to reuse path_matches
+    def resolve_alts_under_path(load_path, logical_name, mime_exts)
+      logical_basename = File.basename(logical_name)
+      
+      candidates,deps = path_matches(load_path, logical_name, logical_basename) if method(:path_matches).super_method
+      if candidates.present?
+        c = candidates.first
+        return [{ filename: c[0], type: c[1] }], deps
+      end
+
+      super
     end
   end
 end
