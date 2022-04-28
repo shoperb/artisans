@@ -26,8 +26,8 @@ module Artisans
 
     def compiled_files(&block)
       Pathname.glob(sources_path.join("**/*")) do |file|
-        logger.notify "Packing #{file}" do
-          process_file file, &block
+        process_file file do |*args|
+          logger.notify("Packing #{file}"){ block.call(*args) }
         end
       end
     end
