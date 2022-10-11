@@ -37,7 +37,9 @@ module Artisans
 
           ext = File.extname(path)
           filename = [path.gsub(/\#{Regexp.quote(ext)}\\z/, ''), separator, digest, ext].map(&:presence).compact.join
-          File.join('#{assets_url}', filename)
+    
+          # if is fixing after_processor AssetUrlProcessor
+          filename.start_with?('#{assets_url}') ? filename : File.join('#{assets_url}', filename)
         end
       }
 
