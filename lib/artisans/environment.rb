@@ -30,14 +30,14 @@ module Artisans
           reader = environment.file_reader
 
           digest = reader.try(:find_digest, full_path)
-          digest ||= Digest::MD5.hexdigest(File.read(full_path)) if File.exists?(full_path)
+          digest ||= Digest::MD5.hexdigest(File.read(full_path)) if File.exist?(full_path)
 
           separator = reader.try(:find_separator, full_path)
           separator ||= ''
 
           ext = File.extname(path)
           filename = [path.gsub(/\#{Regexp.quote(ext)}\\z/, ''), separator, digest, ext].map(&:presence).compact.join
-    
+
           # if is fixing after_processor AssetUrlProcessor
           filename.start_with?('#{assets_url}') ? filename : File.join('#{assets_url}', filename)
         end
@@ -62,7 +62,7 @@ module Artisans
 
       register_preprocessor 'application/liquid', Sprockets::DirectiveProcessor.new(comments: ["//", ["/*", "*/"]])
 
-      # register_transformer is not working on current rails if engine is set, 
+      # register_transformer is not working on current rails if engine is set,
       # so add manually to engine to rewrite Sprockets::ScssProcessor transformer
       self.config = hash_reassoc(config, :engines) do |engines|
         engines.merge(".scss" => Artisans::Sass::SettingsProcessor)
