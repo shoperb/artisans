@@ -84,19 +84,19 @@ module Artisans
              /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf|json))))\z/,
              /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2|svg))))\z/
           yield relative_path, file_content
-          yield source_path, relative_path, type: :symlink
+          yield source_path, relative_path, :symlink
         when /\A((layouts|templates|emails|sections)\/(.*\.liquid))\.haml\z/
           content_compiled = Haml::Engine.new(file_content).render
           yield Pathname.new($1.dup), content_compiled
 
           if file_content == content_compiled
-            yield source_path, Pathname.new($1.dup), type: :symlink
+            yield source_path, Pathname.new($1.dup), :symlink
           else
             yield source_path, file_content
           end
         when /\A((presets|config|translations)\/(.*\.json))\z/
           yield relative_path, file_content
-          yield source_path, relative_path, type: :symlink
+          yield source_path, relative_path, :symlink
         when /\A(assets\/(javascripts\/(.*\.(js|coffee|js\.coffee))))\z/, /\A(assets\/(stylesheets\/(.*\.(css(|\.sass|\.scss)|sass|scss)(\.liquid)?)))\z/
           yield source_path, file_content
       end
