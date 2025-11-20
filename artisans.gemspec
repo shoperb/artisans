@@ -35,5 +35,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sass", "~> 3"
   spec.add_dependency "haml", "~> 6"
   spec.add_dependency "rubyzip", "~> 2.3"
-  spec.add_dependency "sprockets", "3.7.2"
+  spec.add_dependency "sprockets", ">= 3.7.2"
 end
