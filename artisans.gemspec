@@ -29,11 +29,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 2.0"
-  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rake"
 
-  spec.add_dependency "liquid", "~> 4.0"
+  spec.add_dependency "liquid", "~> 5.11.0"
   spec.add_dependency "sass", "~> 3"
-  spec.add_dependency "haml", "~> 6"
-  spec.add_dependency "rubyzip", "~> 2.3"
+  spec.add_dependency "haml", "~> 7"
+  spec.add_dependency "rubyzip", "~> 3.2.2"
   spec.add_dependency "sprockets", "3.7.2"
 end
