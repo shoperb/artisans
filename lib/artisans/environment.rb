@@ -10,7 +10,7 @@ module Artisans
   # Supplying sprockets environment with correct assets paths, custom file importer for Sass::Engine
   # and custom SassProcessor
   #
-  class Environment < ::Sprockets::Environment
+  class Environment #< ::Sprockets::Environment
     attr_reader :sources_path, :settings, :assets_url, :file_reader
 
     def initialize **options, &block
