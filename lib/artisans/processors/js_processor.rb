@@ -6,7 +6,7 @@ module Artisans
       include BaseProcessor
 
       def expand_requires(file_path, loaded = Set.new)
-        raise "File not found: #{file_path}" unless File.exist?(file_path)
+        raise "File not found: #{file_path}" unless file_reader.file_exist?(file_path)
         raise "Not supported file format for #{file}" unless TEST_EXTENSION.include?(File.extname(file_path))
         # Avoid loading the same file twice (like sprockets)
         return "" if loaded.include?(file_path)
@@ -15,7 +15,7 @@ module Artisans
         base_dir = File.dirname(file_path)
         output = []
 
-        File.readlines(file_path).each do |line|
+        file_reader.read(file_path).each_line.each do |line|
           if line =~ %r{//=\s*require\s+([^\s]+)}
             required_name = Regexp.last_match(1)
 
@@ -39,12 +39,12 @@ module Artisans
       def resolve_asset_path(name, base_dir)
         # Try exact filename
         path = File.join(base_dir, name)
-        return path if File.exist?(path)
+        return path if file_reader.file_exist?(path)
 
         # Try JS/CSS extensions
         TEST_EXTENSION.each do |ext|
           candidate = File.join(base_dir, "#{name}#{ext}")
-          return candidate if File.exist?(candidate)
+          return candidate if file_reader.file_exist?(candidate)
         end
 
         nil

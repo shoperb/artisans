@@ -1,13 +1,14 @@
 require 'digest'
-require 'fileutils'
 
 module Artisans
   class ThemeCompiler
     module BaseProcessor
-      attr_accessor :settings, :assets_url
-      def initialize(settings, assets_url)
-        @settings   = settings
-        @assets_url = assets_url
+      attr_accessor :settings, :assets_url, :file_reader, :sources_path
+      def initialize(settings:, assets_url:, file_reader:, sources_path:)
+        @settings     = settings
+        @assets_url   = assets_url
+        @file_reader  = file_reader
+        @sources_path = sources_path
       end
 
       def render(file_path)
@@ -19,7 +20,7 @@ module Artisans
       def digest(path, body)
         base     = File.basename(path, ".*")
         ext      = File.extname(path)
-        digested = Digest::SHA256.hexdigest(body)[0, 20]  # use first 20 chars like Sprockets
+        digested = Artisans::ThemeCompiler.hexdigest(body)
 
         "#{base}-#{digested}#{ext}"
       end

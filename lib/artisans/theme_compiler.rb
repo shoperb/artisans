@@ -65,6 +65,10 @@ module Artisans
       end
     end
 
+    def self.hexdigest(data)
+      Digest::MD5.hexdigest(data)
+    end
+
     DEFAULT_COMPILATION_ASSETS = {
         javascripts: ['application.js'],
         stylesheets: ['application.css']
@@ -80,20 +84,26 @@ module Artisans
       @file_reader  = options[:file_reader] || Artisans::ThemeCompiler::DefaultFileReader
 
       @compile.symbolize_keys!
-      # @compiled_assets = {}
     end
 
     def compile_file(file: nil)
       out = {}
+      params = {
+        settings: settings, 
+        assets_url: assets_url, 
+        file_reader: @file_reader,
+        sources_path: sources_path,
+      }
+      
       if file
         MIME_PROCESSORS.each do |ending, klass|
           next unless file.ends_with?(ending)
           
-          out_file, digested, data = klass.new(settings, assets_url).render(file) 
+          out_file, digested, data = klass.new(**params).render(file) 
           out[out_file] = data
         end
         if out.size.eql?(0)
-          out_file, digested, data = DefaultProcessor.new(settings, assets_url).render(file)
+          out_file, digested, data = DefaultProcessor.new(**params).render(file)
           out[out_file] = data
         end
       end
@@ -102,7 +112,6 @@ module Artisans
 
     def compiled_files(&block)
       Pathname.glob(sources_path.join("**/*")) do |file|
-        p file
         process_file file do |*args|
           logger.notify("Packing #{file}"){ block.call(*args) }
         end
@@ -119,13 +128,6 @@ module Artisans
     end
 
     protected
-    # attr_accessor :compiled_assets
-
-    def compile_without_ext
-      compile.each_with_object({}) do |(type, files), collection|
-        collection[type] = files.map{ |f| File.basename(f, '.*') }
-      end
-    end
 
     def process_file(file)
       relative_path = file.relative_path_from(sources_path)
@@ -134,18 +136,6 @@ module Artisans
       file_content = @file_reader.read(file)
 
       case relative_path.to_s
-        # when /\A(assets\/(stylesheets\/((?:#{compile_without_ext[:stylesheets].join("|")})\.(css(|\.scss)|scss)(\.liquid)?)))\z/
-        #   yield source_path, file_content
-
-        #   compiled = compiled_source($~[2])
-        #   filename = "#{$~[1].gsub(".#{$~[4]}", "")}.css"
-        #   yield Pathname.new(filename), compiled
-        # when /\A(assets\/(javascripts\/((?:#{compile_without_ext[:javascripts].join("|")})\.js)))\z/
-        #   yield source_path, file_content
-
-        #   compiled = compiled_source($~[2])
-        #   filename = "#{$~[1].gsub(".#{$~[4]}", "")}.js"
-        #   yield Pathname.new(filename), compiled
         when /\A((layouts|templates|emails|sections)\/(.*\.liquid))\z/,
              /\A(assets\/((images|icons)\/(.*\.(png|jpg|jpeg|gif|swf|ico|svg|pdf|json))))\z/,
              /\A(assets\/(fonts\/(.*\.(eot|woff|ttf|woff2|svg))))\z/
@@ -163,21 +153,10 @@ module Artisans
         when /\A((presets|config|translations)\/(.*\.json))\z/
           yield relative_path, file_content
           yield source_path, relative_path, :symlink
-        when /\A(assets\/(javascripts\/(.*\.js)))\z/, /\A(assets\/(stylesheets\/(.*\.(css(|\.sass)|sass)(\.liquid)?)))\z/
+        when /\A(assets\/(javascripts\/(.*\.js)))\z/, /\A(assets\/(stylesheets\/(.*\.(css(|\.scss)|scss)(\.liquid)?)))\z/
           yield source_path, file_content
       end
     end
-
-    # def compiled_asset(asset_path)
-    #   compiled_assets[asset_path] ||= begin
-    #     sprockets_env[asset_path]
-    #   rescue StandardError => e
-    #     puts e.message
-    #     puts e.backtrace
-
-    #     raise Artisans::CompilationError.new(e)
-    #   end
-    # end
 
     def logger
       Artisans.configuration.logger
