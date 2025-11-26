@@ -1,4 +1,3 @@
-require 'sass'
 require 'liquid'
 require 'haml'
 require 'zip'

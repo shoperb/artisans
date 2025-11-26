@@ -32,7 +32,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
 
   spec.add_dependency "liquid", "~> 5.11.0"
-  spec.add_dependency "sass", "~> 3"
   spec.add_dependency "haml", "~> 7"
   spec.add_dependency "rubyzip", "~> 3.2.2"
   spec.add_dependency "sass-embedded", '~> 1.94'
