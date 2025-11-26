@@ -4,7 +4,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'sass'
-gem 'sprockets'
 gem 'liquid', git: 'https://github.com/Shopify/liquid.git'
 gem 'haml'
 gem 'rubyzip'

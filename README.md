@@ -2,7 +2,7 @@
 
 Artisans is a gem that helps to compile stylesheets assets in a format of scss.liquid, which might contain settings.
 The main job of this gem is:
-  - To help existing sprocket FileImporter to locate scss files (@import directive), which has scss.liquid extension
+  - To compile assets like Sprockets. For example, to locate scss files (@import directive), which has scss.liquid extension
   - To make existing Sass compiler keep inline comments, which include pattern 'settings.xxx'
 
 ## Installation
@@ -29,30 +29,6 @@ Single asset compiling generally looks as following:
 
 ```ruby
 compiler = Artisans::ThemeCompiler.new(theme_sources_path, theme_assets_url, drops: liquid_drops_hash)
-
-compiled_output = compiler.compiled_source('source/file/path')
-
-# compiling whole theme. ThemeCompiler#compiled_file_with_derivatives yields every result file one by one
-compiler.compiled_files do |file_path, content, type: :file|
-  # type might be :symlink. type = :file is default
-end
-
-# compilation of only 1 file with its derivatives is also possible:
-# in this case compilation of sources/emails.liquid.haml will result in:
-# - sources/emails/xxx.liquid.haml -> just returns source itself
-# - emails/xxx.liquid -> compiled version
-#
-# Compilation of 'sources/translations/en.json' will result in:
-# - sources/translations/en.json -> the source itself
-# - translations/en.json -> a symlink to the source
-#
-# Compilation of sources/stylesheets/application.sass.liquid will result in:
-# - sources/stylesheets/application.sass.liquid
-# - stylesheets/application.css
-
-compiler.compiled_file_with_derivatives('path/to/source') do |file_path, content, type: :file|
-  # type might be :symlink. type = :file is default
-end
 
 ```
 

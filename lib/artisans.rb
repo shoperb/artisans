@@ -1,5 +1,4 @@
 require 'sass'
-require 'sprockets'
 require 'liquid'
 require 'haml'
 require 'zip'

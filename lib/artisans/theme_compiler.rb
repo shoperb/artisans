@@ -1,4 +1,3 @@
-require 'artisans/environment'
 require_relative 'processors/base_processor'
 require_relative 'processors/js_processor'
 require_relative 'processors/css_processor'
@@ -118,15 +117,6 @@ module Artisans
       end
     end
 
-    def compiled_file_with_derivatives(filename, &block)
-      process_file Pathname.new(filename), &block
-    end
-
-    def compiled_source(asset_path)
-      asset = compiled_asset(asset_path)
-      asset ? asset.source : (raise "Asset not found: #{asset_path} in #{sources_path.join('assets')}")
-    end
-
     protected
 
     def process_file(file)
@@ -160,15 +150,6 @@ module Artisans
 
     def logger
       Artisans.configuration.logger
-    end
-
-    def sprockets_env
-      @sprockets_env ||= Artisans::Environment.new(
-        sources_path: sources_path,
-        assets_url: assets_url,
-        settings: settings,
-        file_reader: @file_reader
-      )
     end
   end
 end
