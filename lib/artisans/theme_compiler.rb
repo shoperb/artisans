@@ -109,6 +109,10 @@ module Artisans
       out
     end
 
+    def compiled_file_with_derivatives(filename, &block)
+      process_file Pathname.new(filename), &block
+    end
+
     def compiled_files(&block)
       Pathname.glob(sources_path.join("**/*")) do |file|
         process_file file do |*args|
