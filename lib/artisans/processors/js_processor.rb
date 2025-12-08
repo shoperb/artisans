@@ -24,7 +24,7 @@ module Artisans
             raise "Required file not found: #{required_name}" unless required_path
 
             # Recursively expand
-            output << expand_requires(required_path, loaded)
+            output << expand_requires(required_path, loaded) + "\n"
           elsif line =~ %r{//=\s*require_}
             raise "NotImplemented line"
           else
